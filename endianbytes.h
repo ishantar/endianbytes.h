@@ -89,8 +89,8 @@
  # error error: `endianbytes.h` sadly does not support your architecture.
 
 #elif !defined ENDIAN_BYTES_OK && \
-      defined u8_0 || defined u8_1 || defined u8_2 || defined u8_3 || \
-      defined u8_4 || defined u8_5 || defined u8_6 || defined u8_7
+      (defined u8_0 || defined u8_1 || defined u8_2 || defined u8_3 || \
+       defined u8_4 || defined u8_5 || defined u8_6 || defined u8_7)
   # error warning: `endianbytes.h` redefines the macros `u8_0` through `u8_7`, one or more of which has been set by another file in your program.  The author recommends using an altered copy of `endianbytes.h` that uses appropriate alternatives in place of said identifiers (though note that this alters the member names in `ENDIANBYTES_STRUCT`).
   # error To override this warning (allowing `u8_0`, etc to be redefined), compile with -DENDIAN_BYTES_OK or #define ENDIAN_BYTES_OK before #including `endianbytes.h`.
 
