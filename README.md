@@ -28,13 +28,13 @@ The ENDIANBYTES object macros each expand to a brace-enclosed statement suitable
 While this is unlikely to be useful, note that because the object macros simply expand to declaration-lists, either ENDIANBYTES_STRUCT macro could technically be used to declare a union (or vice-versa).  This point is intended to be illustrative, not as actionable advice. :p
 
 
-An example: the following code would declare a type `struct MyStruct` which contains one anonymous ENDIANBYTES_STRUCT_ASCENDING structure member, and one ENDIANBYTES_STRUCT_DESCENDING structure member named `Desc`, which has type `struct Descending`, and a member with additional name `bottom` addressing its least-significant byte\:
+An example: the following code would declare a type `struct MyStruct` which contains one anonymous ENDIANBYTES_STRUCT_ASCENDING structure member, and one ENDIANBYTES_STRUCT_DESCENDING structure member named `Desc`, which has type `struct Descending`, and a member with unsigned additional name `bottom` addressing its least-significant byte:
 
  ```c
  struct MyStruct {
      struct ENDIANBYTES_STRUCT_ASCENDING;
     # undef u8_7
-    # define u8_7() bottom
+    # define u8_7() unsigned char bottom;
      struct Descending ENDIANBYTES_STRUCT_DESCENDING Desc;
  };
  ```
