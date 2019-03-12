@@ -20,19 +20,30 @@
  * most-significant byte in an ENDIANBYTES_STRUCT_DESCENDING, and the names of
  * the other members will proceed in order of significance.
  *
- * An additional name may be assigned to each member byte.  To set the
- * additional name for a member `u8_[n]`, re-define the macro `u8_[n]()` to
- * expand to the desired name (ie, `#undef u8_[n]`, `#define u8_[n]() [NAME]`).
- * This must be done before declaring the ENDIANBYTES object or type that is to 
- * make use of the name, but *not* before `endianbytes.h` is first #included.
+ * Additional names may be assigned to each member byte; each additional name
+ * must declare a type, which may be any type with sizeof 1.
+ * To set additional names for the member byte with automatic name  `u8_[n]`,
+ * re-define the macro `u8_[n]()` as a function-like macro with no parameters
+ * which expands to a (semicolon-separated and -terminated) series of
+ * declarations that will declare each additional name.
+ * For instance, the following code would cause member byte `u8_0` to have an
+ * unsigned additional name `bottom_8` and a signed additional name `b8`:
+ * `#undef u8_0
+ *  #define u8_0() unsigned char bottom_8; signed char b8;`
+ * Any additional names must be set before declaring an ENDIANBYTES object for
+ * that object to use those additional names.  Only those additional names set
+ * `endianbytes.h` was last #included will be in effect.
  *
  * When an ENDIANBYTES object is declared, it uses any additional names that are
- * currently set.  To unset an additional name, re-define the appropriate 
- * `u8_[n]()` macro such that it expands to nothing.  Leaving a `u8_[n]()` macro
- * undefined will cause an error in future declarations.
+ * currently set.  To unset additional names, re-define the appropriate 
+ * `u8_[n]()` macro with the relevant declarations removed from its expansion.
+ * To unset all of a member byte's additional names, its `u8_[n]()` macro should
+ * expand to nothing.
+ * Leaving a `u8_[n]()` macro undefined will cause an error.
  *
- * All additional names are unset when a file #includes `endianbytes.h`.
- * Repeatedly #including `endianbytes.h` is safe, and can serve this purpose.
+ * All additional names are unset for all member bytes whenever a file #includes
+ * `endianbytes.h`.  It is safe to repeatedly `#include endianbytes.h` for this
+ * purpose.
  *
  *
  * The ENDIANBYTES object macros each expand to a brace-enclosed statement
@@ -53,15 +64,16 @@
  * An example: the following code would declare a type `struct MyStruct` which
  * contains one anonymous ENDIANBYTES_STRUCT_ASCENDING structure member, and one
  * ENDIANBYTES_STRUCT_DESCENDING structure member named `Desc`, which has type 
- * `struct Descending`, and a member with additional name `bottom` addressing
- * its least-significant byte:
+ * `struct Descending`, and a member with unsigned additional name `bottom`
+ * addressing its least-significant byte:
  *
+ * `#include "endianbytes.h"
  *  struct MyStruct {
  *      struct ENDIANBYTES_STRUCT_ASCENDING;
  *     # undef u8_7
- *     # define u8_7() bottom
+ *     # define u8_7() unsigned char bottom;
  *      struct Descending ENDIANBYTES_STRUCT_DESCENDING Desc;
- *  };
+ *  };`
  *
  */
 
@@ -84,9 +96,6 @@
 
 #endif
 
-#ifdef __GNUC__
- # pragma GCC warning "Declaring an ENDIANBYTES_STRUCT or ENDIANBYTES_UNION may generate several warnings regarding missing declarations or declarations lacking identifiers.  These warnings describe the intended behaviour and may be disregarded."
-#endif
 
 #undef u8_0
 #undef u8_1
@@ -162,37 +171,37 @@
 
  #if __SIZEOF_POINTER__ == 4
   #define ENDIANBYTES_STRUCT_ASCENDING { \
-    union { unsigned char EB_CHAR1;  unsigned char EB_CHAR1(); }; \
-    union { unsigned char EB_CHAR2;  unsigned char EB_CHAR2(); }; \
-    union { unsigned char EB_CHAR3;  unsigned char EB_CHAR3(); }; \
-    union { unsigned char EB_CHAR4;  unsigned char EB_CHAR4(); }; \
+    union { unsigned char EB_CHAR1;  EB_CHAR1() }; \
+    union { unsigned char EB_CHAR2;  EB_CHAR2() }; \
+    union { unsigned char EB_CHAR3;  EB_CHAR3() }; \
+    union { unsigned char EB_CHAR4;  EB_CHAR4() }; \
   }
   #define ENDIANBYTES_STRUCT_DESCENDING { \
-    union { unsigned char EB_CHAR4;  unsigned char EB_CHAR4(); }; \
-    union { unsigned char EB_CHAR3;  unsigned char EB_CHAR3(); }; \
-    union { unsigned char EB_CHAR2;  unsigned char EB_CHAR2(); }; \
-    union { unsigned char EB_CHAR1;  unsigned char EB_CHAR1(); }; \
+    union { unsigned char EB_CHAR4;  EB_CHAR4() }; \
+    union { unsigned char EB_CHAR3;  EB_CHAR3() }; \
+    union { unsigned char EB_CHAR2;  EB_CHAR2() }; \
+    union { unsigned char EB_CHAR1;  EB_CHAR1() }; \
   }
  #elif __SIZEOF_POINTER__ == 8
   #define ENDIANBYTES_STRUCT_ASCENDING { \
-    union { unsigned char EB_CHAR1;  unsigned char EB_CHAR1(); }; \
-    union { unsigned char EB_CHAR2;  unsigned char EB_CHAR2(); }; \
-    union { unsigned char EB_CHAR3;  unsigned char EB_CHAR3(); }; \
-    union { unsigned char EB_CHAR4;  unsigned char EB_CHAR4(); }; \
-    union { unsigned char EB_CHAR5;  unsigned char EB_CHAR5(); }; \
-    union { unsigned char EB_CHAR6;  unsigned char EB_CHAR6(); }; \
-    union { unsigned char EB_CHAR7;  unsigned char EB_CHAR7(); }; \
-    union { unsigned char EB_CHAR8;  unsigned char EB_CHAR8(); }; \
+    union { unsigned char EB_CHAR1;  EB_CHAR1() }; \
+    union { unsigned char EB_CHAR2;  EB_CHAR2() }; \
+    union { unsigned char EB_CHAR3;  EB_CHAR3() }; \
+    union { unsigned char EB_CHAR4;  EB_CHAR4() }; \
+    union { unsigned char EB_CHAR5;  EB_CHAR5() }; \
+    union { unsigned char EB_CHAR6;  EB_CHAR6() }; \
+    union { unsigned char EB_CHAR7;  EB_CHAR7() }; \
+    union { unsigned char EB_CHAR8;  EB_CHAR8() }; \
   }
   #define ENDIANBYTES_STRUCT_DESCENDING { \
-    union { unsigned char EB_CHAR8;  unsigned char EB_CHAR8(); }; \
-    union { unsigned char EB_CHAR7;  unsigned char EB_CHAR7(); }; \
-    union { unsigned char EB_CHAR6;  unsigned char EB_CHAR6(); }; \
-    union { unsigned char EB_CHAR5;  unsigned char EB_CHAR5(); }; \
-    union { unsigned char EB_CHAR4;  unsigned char EB_CHAR4(); }; \
-    union { unsigned char EB_CHAR3;  unsigned char EB_CHAR3(); }; \
-    union { unsigned char EB_CHAR2;  unsigned char EB_CHAR2(); }; \
-    union { unsigned char EB_CHAR1;  unsigned char EB_CHAR1(); }; \
+    union { unsigned char EB_CHAR8;  EB_CHAR8() }; \
+    union { unsigned char EB_CHAR7;  EB_CHAR7() }; \
+    union { unsigned char EB_CHAR6;  EB_CHAR6() }; \
+    union { unsigned char EB_CHAR5;  EB_CHAR5() }; \
+    union { unsigned char EB_CHAR4;  EB_CHAR4() }; \
+    union { unsigned char EB_CHAR3;  EB_CHAR3() }; \
+    union { unsigned char EB_CHAR2;  EB_CHAR2() }; \
+    union { unsigned char EB_CHAR1;  EB_CHAR1() }; \
   }
  #endif
 
